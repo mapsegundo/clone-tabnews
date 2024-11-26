@@ -32,9 +32,7 @@ Bem-vindo ao repositório do **Clone TabNews**, um projeto desenvolvido para pra
 
 4. **Inicie o servidor de desenvolvimento:**
     ```bash
-    npm install
-    # ou
-    yarn install
+    npm run dev
 
 5. **Acesse o projeto em:** **http://localhost:3000**
 
