@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import motivationalMessages from "utils/frases";
 
 function Home() {
-  const firstMessage = "De: Shall\nPara: Jeh\nTe amo meu amor ❤️";
+  const firstMessage = "De: Shall\nPara: Jeh\nTe amo meu amor ❤️!";
   const [text, setText] = useState("");
   const [showSecondMessage, setShowSecondMessage] = useState(false);
   const [randomMessage, setRandomMessage] = useState("");
