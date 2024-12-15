@@ -10,8 +10,9 @@ function checkPostgres() {
       return;
     }
 
-    if (stdout.search("accepting connections") === -1) {
+    if (stdout.search("accepting connections") !== -1) {
       console.log("Postgres is ready to accept connections");
+      process.exit(0);
     } else {
       process.stdout.write(".");
       checkPostgres();
