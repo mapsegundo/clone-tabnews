@@ -8,7 +8,7 @@ beforeAll(async () => {
 
 describe("POST /API/V1/MIGRATIONS", () => {
   describe("Anonymous user", () => {
-    describe("Running pending migrations", () => {
+    describe("Retriving pending migrations", () => {
       test("For the first time", async () => {
         const response = await fetch(
           "http://localhost:3000/api/v1/migrations",
