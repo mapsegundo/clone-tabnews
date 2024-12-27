@@ -1,4 +1,5 @@
 import database from "infra/database.js";
+import { InternalServerError } from "infra/errors.js";
 
 async function status(req, res) {
   try {
@@ -34,8 +35,10 @@ async function status(req, res) {
       },
     });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: error.message });
+    const publicErrorObject = new InternalServerError({
+      cause: error,
+    });
+    res.status(500).json({ publicErrorObject });
   }
 }
 
