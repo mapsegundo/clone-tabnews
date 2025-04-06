@@ -1,48 +1,30 @@
-import migrationRunner from "node-pg-migrate";
-import { resolve } from "node:path";
-import database from "infra/database";
+import { getPendingMigrations, runPendingMigrations } from "models/migrator";
+
+const ALLOWED_METHODS = ["GET", "POST"];
 
 export default async function migrations(req, res) {
-  const allowedMethods = ["GET", "POST"];
-  if (!allowedMethods.includes(req.method)) {
-    return res
-      .status(405)
-      .json({ error: `Method "${req.method}" not allowed` });
+  if (!ALLOWED_METHODS.includes(req.method)) {
+    return res.status(405).json({
+      error: `Método "${req.method}" não permitido. Métodos permitidos: ${ALLOWED_METHODS.join(", ")}`,
+    });
   }
 
-  let dbClient;
-
   try {
-    dbClient = await database.getNewClient();
-    const migrationsOptions = {
-      dbClient: dbClient,
-      databaseUrl: process.env.DATABASE_URL,
-      dryRun: true,
-      dir: resolve("infra", "migrations"),
-      direction: "up",
-      verbose: true,
-      migrationsTable: "pgmigrations",
-    };
+    if (req.method === "GET") {
+      const pendingMigrations = await getPendingMigrations();
+      return res.status(200).json(pendingMigrations);
+    }
 
-    if (req.method !== "POST") {
-      const getMigrations = await migrationRunner({
-        ...migrationsOptions,
-        dryRun: true,
-      });
-      return res.status(200).json(getMigrations);
-    }
     if (req.method === "POST") {
-      const postMigrations = await migrationRunner({
-        ...migrationsOptions,
-        dryRun: false,
-      });
-      return res.status(200).json(postMigrations);
+      const executedMigrations = await runPendingMigrations();
+      return res.status(200).json(executedMigrations);
     }
-    return res.status(405).json({ error: "Method not allowed" });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: error.message });
-  } finally {
-    await dbClient.end();
+    console.error("Erro durante a execução das migrações:", error);
+    return res.status(500).json({
+      error: "Erro interno do servidor",
+      details:
+        process.env.NODE_ENV === "development" ? error.message : undefined,
+    });
   }
 }
